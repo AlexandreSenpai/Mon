@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34a7c8ca992f915438a96c2077353778, type: 3}
+  m_Name: Invoker
+  m_EditorClassIdentifier: 
+  brickName: Assets/AI/Trees/Invoker.asset
+  xml: "\uFEFF<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<BehaviorBricks xmlns:ref=\"urn:padaone\"
+    version=\"1.0\">\r\n  <BehaviorTree id=\"0\" />\r\n  <runtimeInfo>\r\n    <BehaviorTree
+    id=\"0\" guid=\"9a6d646793c60704585f69dd1c8dc65a\" nextId=\"13\">\r\n      <root>\r\n       
+    <PrioritySelectorNode id=\"8\" />\r\n      </root>\r\n      <inputParams>\r\n       
+    <inputValues>\r\n          <entry name=\"p-invoke\" type=\"UnityEngine.GameObject\"
+    isBlackboard=\"False\" />\r\n        </inputValues>\r\n      </inputParams>\r\n     
+    <outputParams />\r\n      <localParams />\r\n    </BehaviorTree>\r\n    <PrioritySelectorNode
+    id=\"8\">\r\n      <children>\r\n        <elem>\r\n          <GuardAndNode>\r\n           
+    <guard>\r\n              <ConditionEvalNode id=\"10\" />\r\n            </guard>\r\n           
+    <child>\r\n              <ActionNode id=\"1\" />\r\n            </child>\r\n         
+    </GuardAndNode>\r\n        </elem>\r\n      </children>\r\n      <inputParams
+    />\r\n      <outputParams />\r\n      <localParams />\r\n    </PrioritySelectorNode>\r\n   
+    <ConditionEvalNode id=\"10\" policy=\"WAIT_UNTIL_TRUE_AND_COMPLETE\" name=\"Conditions/IsCloseToEnemy\">\r\n     
+    <inputParams />\r\n      <outputParams />\r\n      <localParams />\r\n    </ConditionEvalNode>\r\n   
+    <ActionNode id=\"1\" action=\"GameObject/Instantiate\">\r\n      <inputParams>\r\n       
+    <inputValues>\r\n          <entry name=\"original\" type=\"UnityEngine.GameObject\"
+    isBlackboard=\"True\" blackboard=\"p-invoke\" />\r\n          <entry name=\"position\"
+    type=\"UnityEngine.Vector3\" isBlackboard=\"False\" value=\"0 0 0\" />\r\n       
+    </inputValues>\r\n      </inputParams>\r\n      <outputParams>\r\n        <outputValues>\r\n         
+    <entry name=\"instantiated\" type=\"UnityEngine.GameObject\" isBlackboard=\"True\"
+    blackboard=\"instantiated\" />\r\n        </outputValues>\r\n      </outputParams>\r\n     
+    <localParams />\r\n    </ActionNode>\r\n  </runtimeInfo>\r\n  <editorInfo>\r\n   
+    <BehaviorTree id=\"0\" _name=\"Invoker\" _description=\"\" _removeIfClosed=\"False\">\r\n     
+    <_rootList>\r\n        <elem>\r\n          <ActionNode id=\"1\" />\r\n       
+    </elem>\r\n        <elem>\r\n          <PrioritySelectorNode id=\"8\" />\r\n       
+    </elem>\r\n        <elem>\r\n          <ConditionEvalNode id=\"10\" />\r\n       
+    </elem>\r\n      </_rootList>\r\n      <_nodes>\r\n        <nodes>\r\n         
+    <ActionNode id=\"1\" />\r\n          <PrioritySelectorNode id=\"8\" />\r\n         
+    <ConditionEvalNode id=\"10\" />\r\n        </nodes>\r\n      </_nodes>\r\n   
+    </BehaviorTree>\r\n    <PrioritySelectorNode id=\"8\">\r\n      <_data>\r\n       
+    <data breakpoint=\"0\" selected=\"False\" position=\"713.1667 332.1666\" name=\"Priority
+    Selector\" description=\"\" cardinality=\"1\" hasParent=\"False\">\r\n         
+    <BehaviorTree id=\"0\" />\r\n          <PrioritySelectorNode id=\"8\" />\r\n       
+    </data>\r\n      </_data>\r\n    </PrioritySelectorNode>\r\n    <ConditionEvalNode
+    id=\"10\">\r\n      <_data>\r\n        <data breakpoint=\"0\" selected=\"False\"
+    position=\"563.1666 549.6667\" name=\"Conditions/IsCloseToEnemy\" description=\"Eval\"
+    cardinality=\"1\" hasParent=\"True\">\r\n          <BehaviorTree id=\"0\" />\r\n         
+    <ConditionEvalNode id=\"10\" />\r\n          <PrioritySelectorNode id=\"8\" />\r\n       
+    </data>\r\n      </_data>\r\n    </ConditionEvalNode>\r\n    <ActionNode id=\"1\">\r\n     
+    <_data>\r\n        <data breakpoint=\"0\" selected=\"True\" position=\"563.1666
+    549.6667\" name=\"GameObject/Instantiate\" description=\"Clones the object original
+    and returns the clone\" cardinality=\"0\" hasParent=\"False\">\r\n          <BehaviorTree
+    id=\"1\" />\r\n        </data>\r\n      </_data>\r\n    </ActionNode>\r\n  </editorInfo>\r\n 
+    <runtimeInfo>\r\n    <BehaviorTree id=\"1\" nextId=\"1\">\r\n      <inputParams
+    />\r\n      <outputParams />\r\n      <localParams />\r\n    </BehaviorTree>\r\n 
+    </runtimeInfo>\r\n  <editorInfo>\r\n    <BehaviorTree id=\"1\" _removeIfClosed=\"False\">\r\n     
+    <_rootList />\r\n      <_nodes>\r\n        <nodes />\r\n      </_nodes>\r\n   
+    </BehaviorTree>\r\n  </editorInfo>\r\n</BehaviorBricks>"
+  zoom: 1
+  subslist:
+  - {fileID: 11400000}
+  _guid: 9a6d646793c60704585f69dd1c8dc65a
