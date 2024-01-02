@@ -1,66 +1,94 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-public class Node {
+using UnityEngine;
 
-    private int x;
-    private int y;
+public class Node : INode {
 
-    private int f = 0;
-    private int g = 0;
-    private int h = 0;
-    private Node parent = null;
-    public bool canPassThrough = false;
+    public int X { get; private set; }
+    public int Y { get; private set; }
+    public int F { get; private set; }
+    public int G { get; private set; }
+    public int H { get; private set; }
+    public INode Parent { get; private set; }
+    public bool CanPassThrough { get; private set; }
+    public bool IsOnClosedList { get; private set; }
+    public bool IsOnOpenList { get; private set; }
 
-    public bool isOnClosedList = false;
-    public bool isOnOpenList = false;
+    public bool Empty { get; private set; }
+    public GameObject Slot { get; private set; }
 
     public Node(int x = 0, int y = 0) {
-        this.x = x;
-        this.y = y;
+        this.X = x;
+        this.Y = y;
+
+        this.F = 0;
+        this.G = 0;
+        this.H = 0;
+
+        this.Parent = null;
+        this.CanPassThrough = true;
+        this.IsOnClosedList = false;
+        this.IsOnOpenList = false;
+
+        this.Empty = true;
+        this.Slot = null;
     }
 
-    public static int Heuristic(Node start, Node end) {
-        return Math.Abs(end.x - start.x) + Math.Abs(end.y - start.y);
+    public void AddSlot(GameObject slot) {
+        this.Empty = false;
+        this.Slot = slot;
     }
 
-    public Node GetParent() {
-        return this.parent;
+    public void RemoveSlot() {
+        this.Empty = true;
+        this.Slot = null;
     }
 
-    public void SetParentNode(Node parent) {
-        this.parent = parent;
+    public void SetCanPassThrough(bool canPassThrough) {
+        this.CanPassThrough = canPassThrough;
+    }
+    public void AddedToList(ListType type) {
+        switch(type) {
+            case ListType.CLOSED:
+                this.IsOnClosedList = true;
+                this.IsOnOpenList = false;
+                break;
+            case ListType.OPEN:
+                this.IsOnOpenList = true;
+                this.IsOnClosedList = false;
+                break;
+        }
     }
 
-    private void CalculateFValue() {
-        this.f = this.g + this.h;
+    private int Manhattan(INode start, INode end) {
+        return Math.Abs(end.X - start.X) + Math.Abs(end.Y - start.Y);
     }
 
-    public void SetGValue(int g) {
-        this.g = g;
-        this.CalculateFValue();
+    private void CalculateF() {
+        this.F = this.G + this.H;
     }
 
-    public void SetHValue(int h) {
-        this.h = h;
-        this.CalculateFValue();
+    public int Heuristic(HeuristicType type, INode start, INode end)
+    {
+        return type switch {
+            HeuristicType.MANHATTAN => this.Manhattan(start, end),
+            _ => -1,
+        };
     }
 
-    public int GetFValue() {
-        return this.f;
+    public void SetG(int g)
+    {
+        this.G = g;
+        this.CalculateF();
     }
 
-    public int GetGValue() {
-        return this.g;
+    public void SetH(int h)
+    {
+        this.H = h;
+        this.CalculateF();
     }
 
-    public int GetX() {
-        return this.x;
+    public void SetParent(INode node)
+    {
+        this.Parent = node;
     }
-
-    public int GetY() {
-        return this.y;
-    }
-
 }

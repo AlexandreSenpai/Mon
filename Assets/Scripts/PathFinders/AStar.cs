@@ -1,103 +1,113 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class AStar : MonoBehaviour
+public class AStar : IPathFinder
 {
-    private GridGenerator gridManager;
-    [SerializeField]
-    public int targetX = 0;
-    public int targetY = 0;
-    void Start()
-    {
-        GameObject grid = GameObject.FindGameObjectWithTag("Grid");
-        this.gridManager = grid.GetComponent<GridGenerator>();
+    public void CalculateDistanceFromTargetToEachNode(Grid grid, INode target) {
+        for(int x = 0; x < grid.Width; x++) {
+            for(int y = 0; y < grid.Height; y++) {
+                INode node = grid.GetNodeAtCoordIfExists(x, y);
+                ISlot slot = node.Slot.GetComponent<ISlot>();
+                if(!slot.Empty) continue;
+                int h = node.Heuristic(HeuristicType.MANHATTAN, node, target);
+                node.SetH(h);
+            }
+        }
     }
 
-    public void Find() {
-        Debug.Log("Initializing Searching.");
-        List<Node> openList = new List<Node>();
-        List<Node> closedList = new List<Node>();
+    private INode FindTheLowestF(List<INode> open) {
+        INode lowest = null;
 
-        Slot startSlot = this.gridManager.GetSlotByCoord((0, 0));
-        Slot targetSlot = this.gridManager.GetSlotByCoord((targetX, targetY));
-        
-        Node start = startSlot.node;
-        Node end = targetSlot.node;
-
-        if(!targetSlot.Empty()) {
-            return;
+        foreach(INode node in open) {
+            if(lowest == null) {
+                lowest = node;
+                continue;
+            }
+            if(node.F > lowest.F) continue;
+            lowest = node;
         }
+
+        return lowest;
+    }
+
+    private List<INode> GetPath(INode target) {
+        INode node = target;
+        List<INode> path = new List<INode>();
+
+        while(node.Parent != null) {
+            path.Add(node);
+            node.Slot.GetComponent<TextMesh>().color = Color.red;
+            node = node.Parent;
+        }
+
+        path.Reverse();
+
+        return path;
+    }
+
+    private void DebugAStarParameters(Grid grid) {
+        for(int x = 0; x < grid.Width; x++) {
+            for(int y = 0; y < grid.Height; y++) {
+                INode node = grid.GetNodeAtCoordIfExists(x, y);
+                TextMesh slot = node.Slot.GetComponent<TextMesh>();
+                slot.GetComponent<TextMesh>().text = $"F={node.F}\nG={node.G}\nH={node.H}";
+            }
+        }
+    }
+
+    public List<INode> Find(Grid grid, INode start, INode target) {
+        List<INode> openList = new List<INode>();
+        List<INode> closedList = new List<INode>();
 
         openList.Add(start);
 
-        for(int x = 0; x < gridManager.blocksPerWidth; x++) {
-            for(int y = 0; y < gridManager.blocksPerHeight; y++) {
-                Slot slot = this.gridManager.GetSlotByCoord((x, y));
-
-                if(!slot.Empty()) {
-                    Node node = new Node(x, y);
-                    node.isOnClosedList = true;
-                    closedList.Add(node);
-                } else {
-                    Node node = new Node(x, y);
-                    node.canPassThrough = true;
-                    int h = Node.Heuristic(start, end);
-                    node.SetHValue(h);
-                }
-
-            }
-        }
+        this.CalculateDistanceFromTargetToEachNode(grid, target);
 
         while(openList.Count > 0) {
-            Node currentNode = openList.OrderBy(node => node.GetFValue()).FirstOrDefault();
-            openList.Remove(currentNode);
+            INode currentNode = this.FindTheLowestF(openList);
+            
+            GameObject currentSlotObj = currentNode.Slot;
+            TextMesh text = currentSlotObj.GetComponent<TextMesh>();
+            text.color = Color.red;
 
+            openList.Remove(currentNode);
+            
+            currentNode.AddedToList(ListType.CLOSED);
             closedList.Add(currentNode);
 
-            if(currentNode.GetX() == end.GetX() && currentNode.GetY() == end.GetY()) {
-                Debug.Log("Found!");
-
-                Node point = end;
-
-                while(point.GetParent() != null) {
-                    GameObject slot = gridManager.GetGrid()[point.GetX(), point.GetY()];
-                    TextMesh text = slot.GetComponent<TextMesh>();
-                    text.color = Color.red;
-                    Debug.Log($"Walk to ({point.GetX()},{point.GetY()})");
-                    point = point.GetParent();
-                }
-
-                return;
+            if(currentNode.X == target.X && currentNode.Y == target.Y) {
+                this.DebugAStarParameters(grid);
+                return this.GetPath(target);
             }
 
-            List<Node> neighbors = this.gridManager.GetSurroundingNodes((currentNode.GetX(), currentNode.GetY()));
-            foreach(Node neighbor in neighbors) {
-                if(neighbor.isOnClosedList) {
+            List<INode> neighbors = grid.GetSurroundingNodes(currentNode.X, currentNode.Y);
+            Debug.Log(neighbors.Count);
+
+            foreach(INode neighbor in neighbors) {
+                neighbor.Slot.GetComponent<TextMesh>().color = Color.yellow;
+                if(neighbor.IsOnClosedList) continue;
+
+                ISlot neighSlot = neighbor.Slot.GetComponent<ISlot>();
+
+                if(!neighSlot.Empty) {
+                    neighbor.AddedToList(ListType.CLOSED);
+                    neighbor.SetCanPassThrough(false);
+                    closedList.Add(neighbor);
+                    neighbor.Slot.GetComponent<TextMesh>().color = Color.magenta;
                     continue;
                 }
 
-                int nextGValue = currentNode.GetGValue();
+                int nextG = currentNode.G + 1;
+                neighbor.SetG(nextG);
+                neighbor.SetParent(currentNode);
 
-                if(!neighbor.isOnOpenList || nextGValue < neighbor.GetGValue()) {
-                    neighbor.SetGValue(nextGValue);
-                    neighbor.SetParentNode(currentNode);
-
-                    if(!neighbor.isOnOpenList) {
-                        neighbor.isOnOpenList = true;
-                        openList.Add(neighbor);
-                    } else {
-                        neighbor.SetParentNode(currentNode);
-                    }
+                if(!neighbor.IsOnOpenList) {
+                    neighbor.AddedToList(ListType.OPEN);
+                    openList.Add(neighbor);
                 }
             }
         }
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        return new List<INode>();
     }
 }
